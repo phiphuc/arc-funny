@@ -1,0 +1,11 @@
+node_modules/
+.next/
+.env
+*.log
+out/
+cache/
+broadcast/
+contracts/lib/
+contracts/cache/
+contracts/out/
+.gitmodules

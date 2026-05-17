@@ -1,0 +1,234 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #06131d;
+  --foreground: #eef6f8;
+  --muted: #8ca0a8;
+  --line: rgba(198, 226, 230, 0.14);
+  --panel: rgba(8, 28, 42, 0.72);
+  --panel-soft: rgba(238, 246, 248, 0.055);
+  --arc: #c8e1e6;
+  --arc-dark: #071925;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: -0.01em;
+}
+
+.arc-page {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 78% 14%, rgba(103, 150, 154, 0.34), transparent 28rem),
+    radial-gradient(circle at 5% 80%, rgba(70, 111, 125, 0.22), transparent 32rem),
+    linear-gradient(145deg, #03090f 0%, #071b27 44%, #12323a 100%);
+}
+
+.arc-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.38;
+  background-image: linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px);
+  background-size: 100% 38px;
+  mask-image: linear-gradient(to bottom, black, transparent 85%);
+}
+
+.arc-orbit {
+  position: absolute;
+  width: 780px;
+  height: 780px;
+  border: 1px solid rgba(202, 229, 232, 0.16);
+  border-radius: 50%;
+  right: -260px;
+  top: 80px;
+  pointer-events: none;
+  animation: orbit-drift 18s ease-in-out infinite alternate;
+}
+.arc-orbit::before,
+.arc-orbit::after {
+  content: "";
+  position: absolute;
+  inset: 86px;
+  border: 1px solid rgba(202, 229, 232, 0.12);
+  border-radius: 50%;
+}
+.arc-orbit::after { inset: 184px; opacity: 0.75; }
+
+.arc-label {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #acc1c8;
+  font-size: 0.74rem;
+}
+
+.arc-card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.075), rgba(255,255,255,0.035));
+  border: 1px solid var(--line);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(18px);
+}
+
+.arc-button-primary {
+  background: #d7e8eb;
+  color: #071925;
+  border: 1px solid rgba(255,255,255,0.25);
+  box-shadow: 0 16px 44px rgba(166, 215, 221, 0.18);
+}
+.arc-button-primary:hover { background: #eef7f8; }
+.arc-button-secondary {
+  background: rgba(255,255,255,0.035);
+  border: 1px solid var(--line);
+  color: #d5e6ea;
+}
+.arc-button-secondary:hover { background: rgba(255,255,255,0.075); }
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.13) 50%, rgba(255,255,255,0.05) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes orbit-drift {
+  from { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); opacity: 0.78; }
+  to { transform: translate3d(-28px, 22px, 0) rotate(7deg) scale(1.04); opacity: 0.95; }
+}
+
+@keyframes slow-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes float-soft {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -14px, 0); }
+}
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(22px) scale(0.98); filter: blur(8px); }
+  to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 0 rgba(215,232,235,0), 0 16px 44px rgba(166,215,221,0.18); }
+  50% { box-shadow: 0 0 42px rgba(215,232,235,0.22), 0 20px 54px rgba(166,215,221,0.28); }
+}
+
+@keyframes scan-line {
+  0% { transform: translateY(-130%); opacity: 0; }
+  20% { opacity: 0.55; }
+  80% { opacity: 0.25; }
+  100% { transform: translateY(130%); opacity: 0; }
+}
+
+@keyframes score-draw {
+  from { stroke-dashoffset: 565; }
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes passport-stamp {
+  0% { transform: translate3d(18px, -18px, 0) rotate(-10deg) scale(1.35); opacity: 0; }
+  58% { transform: translate3d(0, 0, 0) rotate(-10deg) scale(0.92); opacity: 1; }
+  72% { transform: translate3d(0, 0, 0) rotate(-10deg) scale(1.05); opacity: 1; }
+  100% { transform: translate3d(0, 0, 0) rotate(-10deg) scale(1); opacity: 1; }
+}
+
+@keyframes passport-shine {
+  0% { transform: translateX(-160%) rotate(18deg); opacity: 0; }
+  35% { opacity: 0.55; }
+  100% { transform: translateX(180%) rotate(18deg); opacity: 0; }
+}
+
+@keyframes nft-reveal {
+  from { opacity: 0; transform: translateY(18px) scale(0.96); filter: blur(10px); }
+  to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+@keyframes nft-aura {
+  0%, 100% { opacity: 0.28; transform: scale(0.98); }
+  50% { opacity: 0.58; transform: scale(1.03); }
+}
+
+.animate-rise { animation: rise-in 0.8s cubic-bezier(.2,.8,.2,1) both; }
+.animate-rise-delay-1 { animation: rise-in 0.8s cubic-bezier(.2,.8,.2,1) 0.12s both; }
+.animate-rise-delay-2 { animation: rise-in 0.8s cubic-bezier(.2,.8,.2,1) 0.24s both; }
+.animate-float-soft { animation: float-soft 5.5s ease-in-out infinite; }
+.animate-glow-pulse { animation: glow-pulse 3.2s ease-in-out infinite; }
+.animate-slow-spin { animation: slow-spin 34s linear infinite; }
+
+.scan-panel { position: relative; overflow: hidden; }
+.scan-panel::after {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  background: linear-gradient(180deg, transparent 35%, rgba(215,232,235,0.10), transparent 65%);
+  animation: scan-line 5.2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.score-ring {
+  stroke-dashoffset: 565;
+  animation: score-draw 1.25s cubic-bezier(.2,.8,.2,1) 0.2s forwards;
+}
+
+.passport-proof {
+  animation: passport-stamp 0.85s cubic-bezier(.2,.8,.2,1) 0.38s both;
+  transform-origin: 50% 50%;
+}
+
+.passport-book {
+  position: relative;
+  overflow: hidden;
+}
+.passport-book::after {
+  content: "";
+  position: absolute;
+  top: -30%;
+  left: -60%;
+  width: 36%;
+  height: 160%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent);
+  animation: passport-shine 4.4s ease-in-out infinite;
+}
+
+.mint-success-card {
+  position: relative;
+  animation: nft-reveal 0.7s cubic-bezier(.2,.8,.2,1) both;
+}
+
+.nft-preview-shell {
+  position: relative;
+  overflow: hidden;
+}
+
+.nft-preview-shell::before {
+  content: "";
+  position: absolute;
+  inset: -18%;
+  background: radial-gradient(circle at 50% 50%, rgba(188,235,220,0.34), transparent 55%);
+  animation: nft-aura 3.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.nft-preview-image {
+  position: relative;
+  display: block;
+  animation: nft-reveal 0.8s cubic-bezier(.2,.8,.2,1) 0.08s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
+}
