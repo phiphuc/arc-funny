@@ -195,10 +195,47 @@ function buildMetadata(payload) {
 }
 
 app.post('/api/mint', async (req, res) => {
-  const { address, score, tier, sybilRisk, ethereum, arc } = req.body || {};
+  const { address, signature, timestamp } = req.body || {};
 
-  if (!isAddress(address) || score === undefined || tier === undefined) {
-    return res.status(400).json({ error: 'Missing or invalid fields' });
+  // 1. Validate inputs
+  if (!isAddress(address) || !signature || !timestamp) {
+    return res.status(400).json({ error: 'Missing address, signature, or timestamp' });
+  }
+
+  // 2. Check timestamp freshness (5 min window)
+  const now = Date.now();
+  const ts = Number(timestamp);
+  if (isNaN(ts) || Math.abs(now - ts) > 5 * 60 * 1000) {
+    return res.status(400).json({ error: 'Signature expired — please try again' });
+  }
+
+  // 3. Verify signature — recover signer address
+  const message = `ProveArc: verify wallet ownership\n\nAddress: ${address.toLowerCase()}\nTimestamp: ${timestamp}\n\nThis signature only proves you own this wallet.\nIt does NOT approve any transaction or token spending.`;
+
+  let recovered;
+  try {
+    recovered = ethers.verifyMessage(message, signature);
+  } catch (e) {
+    return res.status(400).json({ error: 'Invalid signature' });
+  }
+
+  if (recovered.toLowerCase() !== address.toLowerCase()) {
+    return res.status(403).json({ error: `Signature mismatch: signed by ${recovered}, expected ${address}` });
+  }
+
+  // 4. Backend scores the wallet itself — never trust frontend score
+  let arcData, ethData, score, tierInfo, sybilInfo;
+  try {
+    [arcData, ethData] = await Promise.all([
+      fetchArcData(address),
+      fetchEthData(address)
+    ]);
+    score = calculateScore(arcData, ethData);
+    tierInfo = getTier(score);
+    sybilInfo = detectSybil(arcData, ethData, score);
+  } catch (e) {
+    console.error('Scoring error during mint:', e);
+    return res.status(500).json({ error: 'Failed to score wallet', message: e.message });
   }
 
   const contractAddress = process.env.PROVEARC_NFT_ADDRESS || process.env.PROVABLE_NFT_ADDRESS;
@@ -206,14 +243,30 @@ app.post('/api/mint', async (req, res) => {
     return res.status(500).json({ error: 'Mint config missing' });
   }
 
+  // 5. Mint with backend-verified score
   try {
-    const metadataURI = buildMetadata({ address, score, tier, sybilRisk, ethereum, arc });
+    const mintPayload = {
+      address,
+      score,
+      tier: tierInfo.tier,
+      sybilRisk: sybilInfo.risk,
+      ethereum: {
+        txCount: ethData.txCount,
+        usdcVolume: ethData.usdcVolume
+      },
+      arc: {
+        txCount: arcData.txCount,
+        usdcVolume: arcData.usdcVolume
+      }
+    };
+
+    const metadataURI = buildMetadata(mintPayload);
     const provider = new ethers.JsonRpcProvider(process.env.ARC_RPC_URL);
     const signer = new ethers.Wallet(process.env.DEPLOYER_PRIVATE_KEY, provider);
     const contract = new ethers.Contract(contractAddress, PROVABLE_NFT_ABI, signer);
 
-    const estimatedGas = await contract.mintScore.estimateGas(address, Number(score), Number(tier), metadataURI);
-    const tx = await contract.mintScore(address, Number(score), Number(tier), metadataURI, {
+    const estimatedGas = await contract.mintScore.estimateGas(address, Number(score), Number(tierInfo.tier), metadataURI);
+    const tx = await contract.mintScore(address, Number(score), Number(tierInfo.tier), metadataURI, {
       gasLimit: estimatedGas * 12n / 10n
     });
     const receipt = await tx.wait();
@@ -226,7 +279,9 @@ app.post('/api/mint', async (req, res) => {
       contract: contractAddress,
       explorer: `https://testnet.arcscan.app/tx/${tx.hash}`,
       tokenUri: metadataURI,
-      blockNumber: receipt.blockNumber
+      blockNumber: receipt.blockNumber,
+      verifiedScore: score,
+      verifiedTier: tierInfo.name
     });
   } catch (error) {
     console.error('Mint error:', error);

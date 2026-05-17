@@ -112,24 +112,30 @@ export default function ResultsPage() {
     setMintResult(null);
 
     try {
+      // 1. Connect wallet
       const account = connectedAddress || await connectWallet();
       if (account.toLowerCase() !== result.address.toLowerCase()) {
         throw new Error(`Connected wallet ${account.slice(0, 6)}…${account.slice(-4)} does not match analyzed address`);
       }
 
+      // 2. Switch to Arc Testnet
       await ensureArcNetwork();
 
+      // 3. Sign ownership proof (read-only, no tx approval)
+      const timestamp = Date.now().toString();
+      const message = `ProveArc: verify wallet ownership\n\nAddress: ${account.toLowerCase()}\nTimestamp: ${timestamp}\n\nThis signature only proves you own this wallet.\nIt does NOT approve any transaction or token spending.`;
+
+      if (!window.ethereum) throw new Error('Wallet not found');
+      const signature = await window.ethereum.request({
+        method: 'personal_sign',
+        params: [message, account]
+      });
+
+      // 4. Send to backend — backend re-scores and mints
       const res = await fetch('/api/mint', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          address: result.address,
-          score: result.score,
-          tier: result.tier,
-          sybilRisk: result.sybilRisk,
-          ethereum: result.ethereum,
-          arc: result.arc
-        })
+        body: JSON.stringify({ address: account, signature, timestamp })
       });
 
       const data = await res.json();
@@ -286,6 +292,33 @@ export default function ResultsPage() {
             <p className="mt-4 text-center text-sm leading-6 text-[#91a9b1]">
               Connect the analyzed wallet, switch to Arc testnet, then backend owner mints a soulbound SVG NFT with this score and wallet stats.
             </p>
+
+            <div className="mt-4 rounded-2xl border border-[#bcebdc]/15 bg-[#bcebdc]/[0.06] px-5 py-4">
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 text-lg text-[#bcebdc]">🛡️</div>
+                <div className="space-y-2 text-sm leading-6 text-[#b6cbd1]">
+                  <div className="font-semibold text-[#d8fff0]">Your wallet is safe — here is exactly what happens:</div>
+                  <div className="space-y-1.5">
+                    <div className="flex items-start gap-2">
+                      <span className="mt-0.5 text-[#bcebdc]">✓</span>
+                      <span><strong className="text-[#eef6f8]">You sign a text message</strong> — this only proves you own this address. Your wallet will show the exact text. It is NOT a transaction.</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="mt-0.5 text-[#bcebdc]">✓</span>
+                      <span><strong className="text-[#eef6f8]">No token approvals</strong> — we never ask permission to move your tokens. Zero spending risk.</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="mt-0.5 text-[#bcebdc]">✓</span>
+                      <span><strong className="text-[#eef6f8]">We pay gas</strong> — our server mints the NFT for you. You pay nothing.</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="mt-0.5 text-[#bcebdc]">✓</span>
+                      <span><strong className="text-[#eef6f8]">Score verified server-side</strong> — the backend re-scores your wallet independently. Nobody can fake their score.</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </section>
 
           <section className="animate-rise-delay-1 space-y-6">

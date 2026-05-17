@@ -73,7 +73,7 @@ export default function Home() {
                 Prove your wallet is real
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-[#a9bdc3] md:text-xl">
-                ProveArc analyzes Ethereum and Arc activity, creates a wallet proof summary, and turns reputation into a soulbound NFT on Arc testnet.
+                Paste any wallet address — no connection, no signature, no approval needed. ProveArc reads public blockchain data to score reputation and mint a soulbound NFT on Arc.
               </p>
             </div>
 
@@ -102,15 +102,22 @@ export default function Home() {
 
             <div className="grid max-w-2xl grid-cols-3 gap-3 pt-2">
               {[
-                ['{ETH + ARC}', 'Cross-chain signal'],
-                ['{USDC}', 'Volume scoring'],
-                ['{SBT}', 'Reputation NFT']
+                ['{NO CONNECT}', 'Just paste address'],
+                ['{READ-ONLY}', 'Public data only'],
+                ['{FREE MINT}', 'We pay gas for you']
               ].map(([top, bottom]) => (
                 <div key={top} className="arc-card rounded-2xl p-4">
                   <div className="arc-label text-[0.62rem]">{top}</div>
                   <div className="mt-3 text-sm text-[#d5e6ea]">{bottom}</div>
                 </div>
               ))}
+            </div>
+
+            <div className="mt-4 flex max-w-2xl items-start gap-3 rounded-2xl border border-[#bcebdc]/15 bg-[#bcebdc]/[0.06] px-5 py-4">
+              <div className="mt-0.5 text-lg text-[#bcebdc]">🛡️</div>
+              <div className="text-sm leading-6 text-[#b6cbd1]">
+                <span className="font-semibold text-[#d8fff0]">Your wallet is never at risk.</span> Scoring only reads public blockchain data — no wallet connection, no token approvals, no signatures. Even minting is optional and gas-free: our server mints the NFT for you.
+              </div>
             </div>
           </section>
 
@@ -131,7 +138,8 @@ export default function Home() {
                   ['01', 'Ethereum age, balance, tx count, USDC flow'],
                   ['02', 'Arc tx activity, token movement, latest settlement'],
                   ['03', 'Identity summary and reputation tier'],
-                  ['04', 'Mintable soulbound badge on Arc testnet']
+                  ['04', 'Sign text to verify ownership — no tx, no approval'],
+                  ['05', 'Free soulbound mint — we pay gas, you pay nothing']
                 ].map(([n, text]) => (
                   <div key={n} className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.035] p-4">
                     <div className="arc-label w-10 text-[#d7e8eb]">//{n}</div>
@@ -159,9 +167,9 @@ export default function Home() {
           <h2 className="mt-4 max-w-3xl text-5xl font-light uppercase leading-none tracking-[-0.05em]">Reputation that financial apps can verify</h2>
           <div className="mt-12 grid gap-4 md:grid-cols-3">
             {[
-              ['01', 'Paste address', 'Submit one EVM address. ProveArc pulls Ethereum + Arc wallet activity.'],
-              ['02', 'Score signals', 'The model weighs age, activity, USDC flow, Arc adoption, and sybil heuristics.'],
-              ['03', 'Mint proof', 'High-signal wallets can mint a non-transferable Arc reputation badge.']
+              ['01', 'Paste address', 'Submit any EVM address. No wallet connection needed. ProveArc reads public Ethereum + Arc data only.'],
+              ['02', 'Score signals', 'The engine weighs account age, tx activity, USDC flow, Arc adoption — all from public blockchain data.'],
+              ['03', 'Verify & mint', 'Want the NFT? Sign a text message to prove ownership. No transaction, no approval, no spending. We mint for free.']
             ].map(([n, title, desc]) => (
               <div key={n} className="rounded-[1.5rem] border border-[#071925]/10 bg-white p-6">
                 <div className="font-mono text-xs tracking-[0.18em] text-[#526970]">//R.{n}</div>
