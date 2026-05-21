@@ -8,8 +8,8 @@ AI-powered wallet reputation scoring & sybil detection. Users paste a wallet add
 - Target domain: **provearc.xyz**
 - Local frontend: http://localhost:3457
 - Local backend: http://localhost:3456
-- Arc Testnet contract: `0x34e5cCDf38d94eBc40013676d5Ea169346B177f0`
-- Arcscan: https://testnet.arcscan.app/address/0x34e5cCDf38d94eBc40013676d5Ea169346B177f0
+- Arc Testnet contract: `0x4B58a46de2d44Af1F869b4605758dE2a3e04BE33`
+- Arcscan: https://testnet.arcscan.app/address/0x4B58a46de2d44Af1F869b4605758dE2a3e04BE33
 
 ## Project Structure
 
@@ -31,7 +31,7 @@ AI-powered wallet reputation scoring & sybil detection. Users paste a wallet add
   - Metadata URI
   - Non-transferable `_beforeTokenTransfer` guard
 - Tests: 12/12 passing
-- Deployed on Arc Testnet: `0x34e5cCDf38d94eBc40013676d5Ea169346B177f0`
+- Deployed on Arc Testnet: `0x4B58a46de2d44Af1F869b4605758dE2a3e04BE33`
 
 ### Backend
 
